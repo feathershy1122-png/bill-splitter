@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>聚餐分帳器</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #233044;
+      --muted: #68758a;
+      --line: #dbe4ef;
+      --panel: #ffffff;
+      --blue: #2e6be6;
+      --blue-dark: #1f56c4;
+      --blue-soft: #edf4ff;
+      --yellow: #fff8df;
+      --yellow-line: #f0d36b;
+      --danger: #bd2635;
+      --shadow: 0 18px 45px rgba(38, 61, 94, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f4f8fd 0%, #eaf1fb 100%);
+      color: var(--ink);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(100% - 28px, 620px);
+      margin: 0 auto;
+      padding: 30px 0 42px;
+    }
+
+    .hero {
+      padding: 8px 4px 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--blue);
+      font-size: .9rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 8vw, 3rem);
+      line-height: 1.2;
+      letter-spacing: .02em;
+    }
+
+    .intro {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(219, 228, 239, .8);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    form {
+      padding: 24px;
+    }
+
+    .field + .field { margin-top: 18px; }
+
+    label, legend {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      min-height: 52px;
+      padding: 10px 14px;
+      border: 1px solid #c7d3e2;
+      border-radius: 13px;
+      color: var(--ink);
+      background: #fbfdff;
+      font: inherit;
+      font-size: 1.15rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(46, 107, 230, .14);
+    }
+
+    .hint {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    fieldset {
+      margin: 20px 0 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fbfdff;
+      cursor: pointer;
+    }
+
+    .check-row input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--blue);
+    }
+
+    .check-row span { font-weight: 700; }
+
+    button {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 24px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--blue);
+      color: #fff;
+      font: inherit;
+      font-size: 1.08rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(46, 107, 230, .25);
+    }
+
+    button:hover { background: var(--blue-dark); }
+    button:focus-visible { outline: 4px solid rgba(46, 107, 230, .22); outline-offset: 2px; }
+
+    .error {
+      min-height: 1.6em;
+      margin: 10px 0 0;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 24px;
+    }
+
+    .result h2 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 17px 0 20px;
+    }
+
+    .summary-item {
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: var(--blue-soft);
+    }
+
+    .summary-item small {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .summary-item strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 1.25rem;
+    }
+
+    .people {
+      display: grid;
+      gap: 10px;
+    }
+
+    .person {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .person.payer {
+      border-color: var(--yellow-line);
+      background: var(--yellow);
+    }
+
+    .person-name { font-weight: 800; }
+    .person-note { display: block; color: #937018; font-size: .82rem; }
+    .person-amount { white-space: nowrap; font-size: 1.2rem; font-weight: 900; }
+
+    .footnote {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 430px) {
+      main { width: min(100% - 20px, 620px); padding-top: 22px; }
+      form, .result { padding: 19px; }
+      .summary { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <p class="eyebrow">簡單、快速、剛好對帳</p>
+      <h1>聚餐分帳器</h1>
+      <p class="intro">輸入聚餐金額和人數，零頭會自動算在付錢的人身上。</p>
+    </header>
+
+    <section class="card">
+      <form id="split-form" novalidate>
+        <div class="field">
+          <label for="total">餐費總金額（元）</label>
+          <input id="total" name="total" type="number" min="1" step="1" value="1000" inputmode="numeric" required>
+        </div>
+
+        <div class="field">
+          <label for="people">總人數</label>
+          <input id="people" name="people" type="number" min="1" step="1" value="3" inputmode="numeric" required>
+          <p class="hint">付錢的人也算在總人數裡。</p>
+        </div>
+
+        <fieldset>
+          <legend>服務費</legend>
+          <label class="check-row" for="service">
+            <input id="service" name="service" type="checkbox">
+            <span>加收 10% 服務費</span>
+          </label>
+        </fieldset>
+
+        <button type="submit">開始分帳</button>
+        <p id="error" class="error" role="alert" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="card result" aria-live="polite" aria-atomic="true">
+      <h2>分帳結果</h2>
+      <div class="summary">
+        <div class="summary-item">
+          <small>實際要付總額</small>
+          <strong id="grand-total">NT$1,000</strong>
+        </div>
+        <div class="summary-item">
+          <small>平均每人（未含零頭）</small>
+          <strong id="each-total">NT$333</strong>
+        </div>
+      </div>
+      <div id="people-result" class="people"></div>
+      <p id="footnote" class="footnote">已確認所有人的金額加總後，會剛好等於實際要付總額。</p>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const form = document.querySelector('#split-form');
+      const totalInput = document.querySelector('#total');
+      const peopleInput = document.querySelector('#people');
+      const serviceInput = document.querySelector('#service');
+      const error = document.querySelector('#error');
+      const grandTotal = document.querySelector('#grand-total');
+      const eachTotal = document.querySelector('#each-total');
+      const peopleResult = document.querySelector('#people-result');
+      const footnote = document.querySelector('#footnote');
+      const money = (value) => `NT$${new Intl.NumberFormat('zh-TW').format(value)}`;
+
+      function calculate(event) {
+        if (event) event.preventDefault();
+        error.textContent = '';
+
+        const baseTotal = Number(totalInput.value);
+        const people = Number(peopleInput.value);
+        if (!Number.isInteger(baseTotal) || baseTotal < 1 || !Number.isInteger(people) || people < 1) {
+          error.textContent = '請輸入大於 0 的整數金額和人數。';
+          return;
+        }
+
+        const serviceFee = serviceInput.checked ? Math.round(baseTotal * 0.1) : 0;
+        const payableTotal = baseTotal + serviceFee;
+        const each = Math.floor(payableTotal / people);
+        const remainder = payableTotal % people;
+        const payerAmount = each + remainder;
+
+        grandTotal.textContent = money(payableTotal);
+        eachTotal.textContent = money(each);
+        peopleResult.replaceChildren();
+
+        const payerRow = document.createElement('div');
+        payerRow.className = 'person payer';
+        payerRow.innerHTML = `<div><span class="person-name">付錢的人</span>${remainder > 0 ? '<span class="person-note">已包含零頭</span>' : ''}</div><strong class="person-amount">${money(payerAmount)}</strong>`;
+        peopleResult.appendChild(payerRow);
+
+        for (let index = 1; index < people; index += 1) {
+          const row = document.createElement('div');
+          row.className = 'person';
+          row.innerHTML = `<span class="person-name">其他人 ${index}</span><strong class="person-amount">${money(each)}</strong>`;
+          peopleResult.appendChild(row);
+        }
+
+        footnote.textContent = `已確認 ${money(payerAmount)} + ${money(each)} × ${people - 1} = ${money(payableTotal)}，金額會剛好對上。`;
+      }
+
+      form.addEventListener('submit', calculate);
+      serviceInput.addEventListener('change', calculate);
+      calculate();
+    })();
+  </script>
+</body>
+</html>
+
